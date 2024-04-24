@@ -120,3 +120,22 @@ Se ejecutará cuando se realicen push o pull requests en la rama main.
 
 Este flujo de trabajo automatizado facilita la integración continua y el despliegue de la imagen Docker en Docker Hub cada vez que se realizan cambios en la rama main.
 
+---
+
+### Dockerhub
+
+Observamos cómo se han creado varias versiones de la misma imagen, pues he actualizado varias veces el readme.md
+
+<p align="center">
+  <img src="https://github.com/Sebastianavia/ci-github-2024-1/assets/71205906/3f905ff4-3b7b-4d8d-9d60-1e13363873a0" alt="Descripción de la imagen" width="400">
+</p>
+
+
+Puedes encontrar esta imagen en dockerhub.
+
+    sebastiannavia/appnode1
+
+Con este comando podras bajar la iamgen.
+
+    docker push sebastiannavia/appnode1:tagname
+
