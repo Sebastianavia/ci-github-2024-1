@@ -1,71 +1,118 @@
-# Getting Started with Create React App
+### GitHub actions / Docker / Pipelines
+---
+<p align="justify">
+Este proyecto utiliza Docker para crear una imagen del contenedor que contiene la aplicación web. Luego, se configura un pipeline en GitHub Actions para automatizar la actualización de la imagen de Docker. Cada vez que se realiza un commit en el repositorio, el pipeline se activa y crea una nueva versión del contenedor en Docker Hub con un tag superior al anterior. De esta manera, se asegura que la aplicación esté siempre actualizada y lista para ser desplegada en diferentes entornos.
+</p>
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-hi
+---
 
-## Available Scripts
+<p align="center">
+**Verificamos que...**
+</p>
 
-In the project directory, you can run:
 
-### `npm start`
+<p align="justify">	
+Este proyecto tiene un código fuente escrito en JavaScript (y posiblemente también HTML y CSS) que genera una página web. Utiliza React, una biblioteca de JavaScript para construir interfaces de usuario, y Create React App proporciona una estructura inicial y herramientas de desarrollo para facilitar la creación de la aplicación web.
+</p>
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+<p align="center">
+Si ejecutamos nuestra aplicación, obtendríamos este resultado. 👍🏼👍🏼
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+  <img src="https://github.com/Sebastianavia/ci-github-2024-1/assets/71205906/a69d7c31-f584-48d3-987a-95bfaba70ca7" width="400" alt="Descripción de la imagen">
+</p>
 
-### `npm test`
+---
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Docker:
 
-### `npm run build`
+Crearemos un Dockerfile en la raíz del proyecto para contenerizar la aplicación.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```
+# Utilizamos una imagen base con Node.js
+FROM node:latest
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+# Establecemos el directorio de trabajo dentro del contenedor
+WORKDIR /app
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+# Copiamos los archivos de configuración y dependencias del proyecto
+COPY package.json package-lock.json ./
+COPY public ./public
+COPY src ./src
 
-### `npm run eject`
+# Instalamos las dependencias del proyecto
+RUN npm install
+RUN npm run build
+CMD ["npm","run","dev"]
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+# Exponemos el puerto en el que se ejecutará la aplicación (por defecto, 3000)
+EXPOSE 3000
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+# Comando para ejecutar la aplicación
+CMD ["npm", "start"]
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```
 
-## Learn More
+---
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### GitHub Actions
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+<p align="justify">
+Para automatizar el proceso de contenerización y despliegue de la aplicación, vamos a utilizar GitHub Actions. Este servicio nos permite definir flujos de trabajo automatizados que se activan en respuesta a eventos específicos, como confirmaciones de código o actualizaciones de repositorios.
 
-### Code Splitting
+A continuación, se presenta el archivo YAML de configuración de GitHub Actions, el cual define el flujo de trabajo que será ejecutado:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
-### Analyzing the Bundle Size
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+</p>
+```
+name: Docker Image CI
 
-### Making a Progressive Web App
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+jobs:
 
-### Advanced Configuration
+  build:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+    runs-on: ubuntu-latest
 
-### Deployment
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2 # Specify the version of the checkout action
+    
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile -t sebastiannavia/appnode1:${{ github.run_number }}
+      # Use github.run_number to tag the Docker image with a unique identifier
+    
+    - name: Docker Login
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+    - name: Push into Docker-hub
+      run: docker push sebastiannavia/appnode1:${{ github.run_number }}
+      # Use github.run_number to reference the same tag used during build
+```
 
-### `npm run build` fails to minify
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+---
+
+**Nombre del flujo de trabajo:** Docker Image CI
+- Eventos desencadenantes:
+Se ejecutará cuando se realicen push o pull requests en la rama main.
+	* **Trabajos:**
+		* **build:** Define que se ejecutará en una máquina virtual con Ubuntu.
+		* **Pasos:**
+			1. **Checkout:** Obtiene el código fuente del repositorio.
+			2. **Construir la imagen Docker:** Utiliza el archivo Dockerfile para construir una imagen Docker. La imagen se etiqueta con un identificador único generado por github.run_number.
+
+			3. **Inicio de sesión en Docker:** Utiliza las credenciales almacenadas en los secretos de GitHub para iniciar sesión en Docker Hub.
+			4. **Subida a Docker Hub:** Sube la imagen Docker a Docker Hub, utilizando la etiqueta generada previamente por github.run_number.
+
+Este flujo de trabajo automatizado facilita la integración continua y el despliegue de la imagen Docker en Docker Hub cada vez que se realizan cambios en la rama main.
+
