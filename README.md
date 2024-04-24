@@ -19,10 +19,12 @@ Este proyecto tiene un código fuente escrito en JavaScript (y posiblemente tamb
 
 <p align="center">
 Si ejecutamos nuestra aplicación, obtendríamos este resultado. 👍🏼👍🏼
-
-  <img src="https://github.com/Sebastianavia/ci-github-2024-1/assets/71205906/a69d7c31-f584-48d3-987a-95bfaba70ca7" width="400" alt="Descripción de la imagen">
 </p>
 
+
+<p align="center">
+  <img src="https://github.com/Sebastianavia/ci-github-2024-1/assets/71205906/a69d7c31-f584-48d3-987a-95bfaba70ca7" width="400" alt="Descripción de la imagen">
+</p>
 ---
 
 ### Docker:
