@@ -5,10 +5,12 @@ Este proyecto utiliza Docker para crear una imagen del contenedor que contiene l
 </p>
 
 ---
+     
 
 <p align="center">
-**Verificamos que...**
+  <strong>Verificamos que...</strong>
 </p>
+
 
 
 <p align="justify">	
@@ -65,42 +67,42 @@ A continuación, se presenta el archivo YAML de configuración de GitHub Actions
 
 
 </p>
-```
-name: Docker Image CI
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    name: Docker Image CI
 
-jobs:
+    on:
+    push:
+        branches: [ "main" ]
+    pull_request:
+        branches: [ "main" ]
 
-  build:
+    jobs:
 
-    runs-on: ubuntu-latest
+    build:
 
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2 # Specify the version of the checkout action
-    
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile -t sebastiannavia/appnode1:${{ github.run_number }}
-      # Use github.run_number to tag the Docker image with a unique identifier
-    
-    - name: Docker Login
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        runs-on: ubuntu-latest
 
-    - name: Push into Docker-hub
-      run: docker push sebastiannavia/appnode1:${{ github.run_number }}
-      # Use github.run_number to reference the same tag used during build
-```
+        steps:
+        - name: Checkout
+        uses: actions/checkout@v2 # Specify the version of the checkout action
+        
+        - name: Build the Docker image
+        run: docker build . --file Dockerfile -t sebastiannavia/appnode1:${{ github.run_number }}
+        # Use github.run_number to tag the Docker image with a unique identifier
+        
+        - name: Docker Login
+        uses: docker/login-action@v2
+        with:
+            username: ${{ secrets.DOCKER_USERNAME }}
+            password: ${{ secrets.DOCKER_PASSWORD }}
+
+        - name: Push into Docker-hub
+        run: docker push sebastiannavia/appnode1:${{ github.run_number }}
+        # Use github.run_number to reference the same tag used during build
 
 
----
+
+
 
 **Nombre del flujo de trabajo:** Docker Image CI
 - Eventos desencadenantes:
